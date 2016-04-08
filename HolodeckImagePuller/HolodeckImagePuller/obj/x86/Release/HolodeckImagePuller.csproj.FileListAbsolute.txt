@@ -1,0 +1,13 @@
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\bin\Release\HolodeckImagePuller.exe
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\bin\Release\HolodeckImagePuller.pdb
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\MainWindow.baml
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\MainWindow.g.cs
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\App.g.cs
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\HolodeckImagePuller_MarkupCompile.cache
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\HolodeckImagePuller.g.resources
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\WpfApplication1.Properties.Resources.resources
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\GenerateResource.read.1.tlog
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\GenerateResource.write.1.tlog
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\HolodeckImagePuller.exe
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Release\HolodeckImagePuller.pdb

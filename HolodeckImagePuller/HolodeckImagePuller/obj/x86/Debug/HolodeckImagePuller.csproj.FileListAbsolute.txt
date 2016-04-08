@@ -1,0 +1,11 @@
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\bin\Debug\HolodeckImagePuller.exe
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\bin\Debug\HolodeckImagePuller.pdb
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\MainWindow.baml
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\MainWindow.g.cs
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\App.g.cs
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\HolodeckImagePuller_MarkupCompile.cache
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\HolodeckImagePuller.g.resources
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\WpfApplication1.Properties.Resources.resources
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\HolodeckImagePuller.exe
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\HolodeckImagePuller.pdb
+C:\Users\Tom\documents\visual studio 2010\Projects\HolodeckImagePuller\HolodeckImagePuller\obj\x86\Debug\HolodeckImagePuller.csproj.GenerateResource.Cache

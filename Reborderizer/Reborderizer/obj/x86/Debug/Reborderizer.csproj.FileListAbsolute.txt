@@ -1,0 +1,6 @@
+C:\Users\Tom\documents\visual studio 2010\Projects\Reborderizer\Reborderizer\bin\Debug\Reborderizer.exe
+C:\Users\Tom\documents\visual studio 2010\Projects\Reborderizer\Reborderizer\bin\Debug\Reborderizer.pdb
+C:\Users\Tom\documents\visual studio 2010\Projects\Reborderizer\Reborderizer\bin\Debug\itextsharp.dll
+C:\Users\Tom\documents\visual studio 2010\Projects\Reborderizer\Reborderizer\obj\x86\Debug\Reborderizer.exe
+C:\Users\Tom\documents\visual studio 2010\Projects\Reborderizer\Reborderizer\obj\x86\Debug\Reborderizer.pdb
+C:\Users\Tom\Documents\Visual Studio 2010\Projects\Reborderizer\Reborderizer\obj\x86\Debug\Reborderizer.csprojResolveAssemblyReference.cache
