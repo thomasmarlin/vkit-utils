@@ -12,9 +12,30 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace WpfApplication1
 {
+
+
+    public class Card
+    {
+        public string fileName = "";
+        public string cardName = "";
+        public string side = "";
+        public string setName = "";
+        public bool nameFixed = false;
+
+        public Card(string _fileName, string _cardName, string _side, string _setName)
+        {
+            fileName = _fileName;
+            cardName = _cardName;
+            side = _side;
+            setName = _setName;
+        }
+    };
+
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -35,37 +56,30 @@ namespace WpfApplication1
             }
 
 
-            Dictionary<string, string> darkCards = GetHolotableCards(myHolotableFolder.Text, myHolotableFolder.Text + "\\darkside.cdf");
-            Dictionary<string, string> lightCards = GetHolotableCards(myHolotableFolder.Text, myHolotableFolder.Text + "\\lightside.cdf");
+            LinkedList<Card> darkCards = GetHolotableCards(myHolotableFolder.Text, myHolotableFolder.Text + "\\darkside.cdf", false);
+            LinkedList<Card> lightCards = GetHolotableCards(myHolotableFolder.Text, myHolotableFolder.Text + "\\lightside.cdf", true);
 
-            // For each card, see if there is a full-image card available
-            string[] allFiles = Directory.GetFiles(myHolotableFolder.Text + "\\cards\\starwars", "*.*", SearchOption.AllDirectories);
+            darkCards = ReplaceWithFullImages(ref darkCards);
 
-            darkCards = ReplaceWithFullImages(ref darkCards, ref allFiles);
-            darkCards = GetFriendlyNameCards(ref darkCards);
-
-            lightCards = ReplaceWithFullImages(ref lightCards, ref allFiles);
-            lightCards = GetFriendlyNameCards(ref lightCards);
+            lightCards = ReplaceWithFullImages(ref lightCards);
 
             // Get a unique list of cards, adding " (Light)" or " (Dark)" suffixes if needed
-            Dictionary<string, string> allCards = GetUniqueCardList(ref darkCards, ref lightCards);
+            LinkedList<Card> allCards = GetUniqueCardList(ref darkCards, ref lightCards);
 
 
             // Next, output all of the cards to the output folder:
-            foreach (var file in allCards)
+            foreach (var card in allCards)
             {
-                //string fileNameNoExtension = System.IO.Path.GetFileNameWithoutExtension(file.Key);
-
-
-                string cardFolder = System.IO.Path.Combine(myOutputFolder.Text, file.Key);
+ 
+                string cardFolder = System.IO.Path.Combine(myOutputFolder.Text, card.cardName);
                 string cardPath = System.IO.Path.Combine(cardFolder, "image.png");
                 Directory.CreateDirectory(cardFolder);
 
-                File.Copy(file.Value, cardPath, true);
+                File.Copy(card.fileName, cardPath, true);
                 System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(cardPath);
                 if (bmp.Width > bmp.Height)
                 {
-                    string flippedName = cardPath.Replace(".png", "_FLIPPED.png"); 
+                    string flippedName = cardPath.Replace(".png", "_FLIPPED.png");
                     bmp.RotateFlip(System.Drawing.RotateFlipType.Rotate90FlipNone);
                     bmp.Save(flippedName);
                     File.Delete(cardPath);
@@ -85,33 +99,12 @@ namespace WpfApplication1
                 removed = removed.Substring(1);
             }
 
-            while (removed[removed.Length-1] == '\\' || removed[removed.Length-1] == '"')
+            while (removed[removed.Length - 1] == '\\' || removed[removed.Length - 1] == '"')
             {
                 removed = removed.Substring(0, removed.Length - 1);
             }
 
             return removed;
-        }
-
-        static Dictionary<string, string> GetFriendlyNameCards(ref Dictionary<string, string> unfriendlyCards)
-        {
-            Dictionary<string, string> friendlyCards = new Dictionary<string, string>();
-            foreach (var card in unfriendlyCards)
-            {
-                string cardName = GetFriendlyName(card.Key);
-                int i = 0;
-                string uniqueCard = cardName;
-                while (friendlyCards.ContainsKey(uniqueCard))
-                {
-                    i++;
-                    uniqueCard = cardName + "_" + i;
-                }
-                cardName = uniqueCard;
-
-                friendlyCards.Add(cardName, card.Value);
-            }
-
-            return friendlyCards;
         }
 
 
@@ -132,44 +125,54 @@ namespace WpfApplication1
             return friendlyName;
         }
 
-        static Dictionary<string, string> GetUniqueCardList(ref Dictionary<string, string> darkCards, ref Dictionary<string, string> lightCards)
+
+        static LinkedList<Card> GetUniqueCardList(ref LinkedList<Card> darkCards, ref LinkedList<Card> lightCards)
         {
-            Dictionary<string, string> allCards = new Dictionary<string, string>();
+            LinkedList<Card> allCards = new LinkedList<Card>();
 
-            Dictionary<string, string> list1 = darkCards;
-            Dictionary<string, string> list2 = lightCards;
-            string sufficForDuplicates = " (Dark)";
-
-            for (int i = 0; i < 2; i++)
+            foreach (var card in darkCards)
             {
-                if (i == 1)
+                allCards.AddLast(card);
+            }
+
+            foreach (var card in lightCards)
+            {
+                allCards.AddLast(card);
+            }
+
+
+            // Apply (Light/Dark) and optionally (Set) to resolve all duplicates
+            foreach (Card card1 in allCards)
+            {
+
+                LinkedList<Card> cardsMatchingName = new LinkedList<Card>();
+
+                foreach (Card card2 in allCards)
                 {
-                    sufficForDuplicates = " (Light)";
-                    list1 = lightCards;
-                    list2 = darkCards;
+                    if (card1 == card2)
+                    {
+                        continue;
+                    }
+
+                    // Add to the list of matches
+                    if (card1.cardName == card2.cardName)
+                    {
+                        cardsMatchingName.AddLast(card2);
+                    }
                 }
 
-                // Add all of the cards to our master list
-                // If there is a duplicate file name in dark and light, 
-                // add "(Dark)" and "(Light)" suffixes to the cards
-                foreach (var card1 in list1)
+                if (cardsMatchingName.Count > 0)
                 {
-                    bool duplicateExists = false;
-                    foreach (var card2 in list2)
-                    {
-                        if (card1.Key == card2.Key)
-                        {
-                            duplicateExists = true;
-                        }
-                    }
+                    cardsMatchingName.AddLast(card1);
+                }
 
-                    if (!duplicateExists)
+                // Add Set + Side to every card to resolve the duplication
+                foreach (Card dupNamedCard in cardsMatchingName)
+                {
+                    if (!dupNamedCard.nameFixed)
                     {
-                        allCards.Add(card1.Key, card1.Value);
-                    }
-                    else
-                    {
-                        allCards.Add(card1.Key + sufficForDuplicates, card1.Value);
+                        dupNamedCard.cardName = dupNamedCard.cardName + " (" + dupNamedCard.setName + ") (" + dupNamedCard.side + ")";
+                        dupNamedCard.nameFixed = true;
                     }
                 }
             }
@@ -177,33 +180,56 @@ namespace WpfApplication1
             return allCards;
         }
 
-        static Dictionary<string, string> ReplaceWithFullImages(ref Dictionary<string, string> allCards, ref string[] allFiles)
+        static LinkedList<Card> ReplaceWithFullImages(ref LinkedList<Card> allCards)
         {
-            Dictionary<string, string> fullImages = new Dictionary<string, string>();
             foreach (var card in allCards)
             {
-                string largeVersion = card.Value.Replace(@"/t_", @"\large\");
-                if (File.Exists(largeVersion))
+                string largeVersionPath = card.fileName.Replace(@"/t_", @"\large\");
+                if (File.Exists(largeVersionPath))
                 {
-                    fullImages.Add(card.Key, largeVersion);
+                    card.fileName = largeVersionPath;
                 }
                 else
                 {
-                    fullImages.Add(card.Key, card.Value);
+                    // Oh well...leave it alone
                 }
             }
 
-            return fullImages;
+            return allCards;
         }
 
 
-        static Dictionary<string, string> GetCardsFromString(string readLine, string holotableInstall, ref Dictionary<string, string> existingCards)
+        static LinkedList<Card> GetCardsFromString(bool isLight, string readLine, string holotableInstall, ref LinkedList<Card> existingCards)
         {
-            Dictionary<string, string> allCards = new Dictionary<string, string>();
-
-            Dictionary<string, string> foundCards = new Dictionary<string, string>();
+            LinkedList<Card> foundCards = new LinkedList<Card>();
             if (readLine.StartsWith("card"))
             {
+
+                // Set String we look for is:     Set: Death Star II\n
+                // Full Holotable line: card "/starwars/ReflectionsII-Dark/t_theemperor" "�The Emperor (1)\nDark Character - Dark Jedi Master/Imperial [PM]\nSet: Reflections II\nPower: 4 Ability: 7 Dark Jedi Master\nDeploy: 6 Forfeit: 9\nIcons: Death Star II\n\nLore: Leader. Secretive manipulator of the galaxy. Played Darth Vader and Prince Xizor off against one another in his relentless pursuit of 'young Skywalker'.\n\nText: Deploys only to Coruscant or Death Star II. Never moves to a site occupied by opponent (even if carried). If Vader or Xizor here, and Luke is not on table, adds 2 to attrition against opponent at other locations. Immune to attrition."
+
+
+                // Get the Set
+                var cardSet = "";
+                Regex regex = new Regex("Set:.*?\\\\n");
+                Match match = regex.Match(readLine);
+                if (match.Success)
+                {
+                    //Console.WriteLine(match.Value);
+                    cardSet = match.Value;
+                    cardSet = cardSet.Replace("Set:", "");
+                    cardSet = cardSet.Replace("\\n", "");
+                    cardSet.Trim();
+                    cardSet = cardSet.Trim();
+                }
+
+                // Get Light/Dark
+                var side = "Light";
+                if (!isLight)
+                {
+                    side = "Dark";
+                }
+
                 // Parse the line into:
                 // card file name\nMoreData
 
@@ -227,51 +253,44 @@ namespace WpfApplication1
                     // 2 cards. After and before the slash
                     int indexOfSecondFile = relativePath.LastIndexOf('/');
                     int indexOfFirstFile = relativePath.LastIndexOf('/', indexOfSecondFile - 1);
-                    
-                    string firstFileName = relativePath.Substring(indexOfFirstFile+1, (indexOfSecondFile - 1) - indexOfFirstFile);
+
+                    string firstFileName = relativePath.Substring(indexOfFirstFile + 1, (indexOfSecondFile - 1) - indexOfFirstFile);
                     string secondFileName = relativePath.Substring(indexOfSecondFile + 1);
 
                     int indexOfSecondCardName = cardName.IndexOf('/');
                     string firstCardName = cardName.Substring(0, indexOfSecondCardName);
-                    string secondCardName = cardName.Substring(indexOfSecondCardName+1);
+                    string secondCardName = cardName.Substring(indexOfSecondCardName + 1);
                     firstCardName = firstCardName.Trim();
-                    secondCardName = secondCardName.Trim();
+                    secondCardName = secondCardName.Trim() + "_back";
 
                     firstFileName = holotableInstall + "\\cards\\" + relativePath.Substring(0, indexOfFirstFile) + "/" + firstFileName + ".gif";
                     secondFileName = holotableInstall + "\\cards\\" + relativePath.Substring(0, indexOfFirstFile) + "/t_" + secondFileName + ".gif";
 
-                    foundCards.Add(firstCardName, firstFileName);
-                    foundCards.Add(secondCardName, secondFileName);
+                    firstCardName = GetFriendlyName(firstCardName);
+                    secondCardName = GetFriendlyName(secondCardName);
+                    var card1 = new Card(firstFileName, firstCardName, side, cardSet);
+                    var card2 = new Card(secondFileName, secondCardName, side, cardSet);
+
+                    foundCards.AddLast(card1);
+                    foundCards.AddLast(card2);
                 }
                 else
                 {
+                    cardName = GetFriendlyName(cardName);
                     string file = holotableInstall + "\\cards\\" + relativePath + ".gif";
-                    foundCards.Add(cardName, file);
+                    var card = new Card(file, cardName, side, cardSet);
+                    foundCards.AddLast(card);
                 }
 
             }
 
-            foreach (var card in foundCards)
-            {
-                string cardName = card.Key;
 
-                int i = 0;
-                string uniqueCard = cardName;
-                while (existingCards.ContainsKey(uniqueCard))
-                {
-                    i++;
-                    uniqueCard = cardName + "_" + i;
-                }
-                cardName = uniqueCard;
-                allCards.Add(cardName, card.Value);
-            }
-
-            return allCards;
+            return foundCards;
         }
 
-        static Dictionary<string, string> GetHolotableCards(string holotableInstall, string cdfFile)
+        static LinkedList<Card> GetHolotableCards(string holotableInstall, string cdfFile, bool isLight)
         {
-            Dictionary<string, string> allCards = new Dictionary<string, string>();
+            LinkedList<Card> allCards = new LinkedList<Card>();
 
             // Open the CDF and add all of the cards
             StreamReader cdfReader = new StreamReader(cdfFile);
@@ -279,16 +298,17 @@ namespace WpfApplication1
 
             while (readLine != null)
             {
-                if (readLine.StartsWith("card \"/legacy"))
+                //Console.WriteLine(readLine);
+                if (readLine.StartsWith("card \"/legacy") || readLine.StartsWith("card \"/TWOSIDED/legacy"))
                 {
                     // Legacy card. Skip it!
                 }
                 else
                 {
-                    Dictionary<string, string> cards = GetCardsFromString(readLine, holotableInstall, ref allCards);
+                    LinkedList<Card> cards = GetCardsFromString(isLight, readLine, holotableInstall, ref allCards);
                     foreach (var card in cards)
                     {
-                        allCards.Add(card.Key, card.Value);
+                        allCards.AddLast(card);
                     }
                 }
                 readLine = cdfReader.ReadLine();
@@ -297,41 +317,7 @@ namespace WpfApplication1
             return allCards;
         }
 
-        static void AddCard(string path, ref Dictionary<string, string> allCards)
-        {
-
-            string cardName = System.IO.Path.GetFileNameWithoutExtension(path);
-
-            if (path.Contains(@"starwars\Virtual"))
-            {
-                cardName += " (V)";
-            }
-
-            if (path.Contains("-Dark"))
-            {
-                cardName += " (Dark)";
-            }
-            else if (path.Contains("-Light"))
-            {
-                cardName += " (Light)";
-            }
-
-
-
-            if (cardName.StartsWith("t_"))
-            {
-                cardName = cardName.Substring(2);
-            }
-
-
-            if (allCards.ContainsKey(cardName))
-            {
-                allCards[cardName] = path;
-            }
-            else
-            {
-                allCards.Add(cardName, path);
-            }
-        }
     }
 }
+
+
